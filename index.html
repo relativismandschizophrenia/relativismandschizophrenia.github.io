@@ -3,11 +3,12 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>viewer</title>
   <style>
     body {
       margin: 0;
+      padding: 0;
     }
     pdfjs-viewer-element {
       height: 100vh;
@@ -20,10 +21,9 @@
   <pdfjs-viewer-element 
     src="/test.pdf" 
     viewer-path="/pdfjs-4.10.38-dist" 
-    page="1"
+    viewer-css-theme="DARK"
     zoom="30"
     viewer-extra-styles="#toolbarContainer { display: none; }"
-    viewer-extra-styles="#root { body-bg-color: rgba(255, 247, 252, .7); }"
     >
   </pdfjs-viewer-element>
 
