@@ -23,17 +23,12 @@
       viewer-css-theme="DARK"
       zoom="30"
       viewer-extra-styles=" 
-        #toolbarContainer {
-          height: 0px !important;
-          overflow: hidden !important;
-        }
-        #toolbarContainer > * {
-          display: none !important;
-        }
+        #toolbarContainer,
         #secondaryToolbar, 
         #sidebarContainer {
           height: 0px !important;
           overflow: hidden !important;
+          display: none !important;
         }"
     ></pdfjs-viewer-element>
 
@@ -41,8 +36,7 @@
     <script>
       window.addEventListener('load', () => {
         const pdfViewer = document.querySelector('pdfjs-viewer-element');
-        // Listen for the "documentloaded" event which fires when the PDF is fully loaded.
-        pdfViewer.addEventListener('documentloaded', () => {
+        
           // Access the viewer's shadow DOM.
           const shadow = pdfViewer.shadowRoot;
           if (!shadow) {
