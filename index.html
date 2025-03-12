@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Portfolio PDF Viewer</title>
-  <!-- Include PDF.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <!-- Optionally include PDF.js viewer CSS for proper styling of text/annotation layers -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf_viewer.min.css">
   <style>
     body {
@@ -25,21 +23,15 @@
       display: block;
       margin: 0 auto;
     }
-    /* Allow text selection by enabling pointer events on the text layer.
-       Set a lower z-index so that the annotation layer (with links) remains on top. */
-    .textLayer {
+    .textLayer, .annotationLayer {
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
-      pointer-events: auto;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
-    /* The annotation layer is placed above the text layer to ensure clickable links work */
-    .annotationLayer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
+    .annotationLayer a {
       pointer-events: auto;
     }
     #controls {
@@ -65,60 +57,37 @@
   </div>
 
   <script>
-    // Specify the workerSrc for PDF.js
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-    // URL of the PDF file – update with your file path or URL
     const url = 'test.pdf';
 
     let pdfDoc = null,
         pageNum = 1,
-        pageRendering = false,
-        pageNumPending = null,
-        scale = 1.0, // Default zoom level
+        scale = 1.0,
         canvas = document.getElementById('pdf-canvas'),
         ctx = canvas.getContext('2d'),
         container = document.getElementById('pdf-container'),
         textLayerDiv = document.getElementById('text-layer'),
         annotationLayerDiv = document.getElementById('annotation-layer');
 
-    /**
-     * Renders a page with interactive layers.
-     * @param {number} num The page number.
-     */
     function renderPage(num) {
-      pageRendering = true;
-      // Clear previous text and annotation layers
-      textLayerDiv.innerHTML = '';
-      annotationLayerDiv.innerHTML = '';
-      
       pdfDoc.getPage(num).then(function(page) {
         const viewport = page.getViewport({ scale: scale });
-        // Set canvas dimensions
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        // Position overlay layers to match canvas size and position
+        textLayerDiv.innerHTML = '';
+        annotationLayerDiv.innerHTML = '';
+
         textLayerDiv.style.height = canvas.height + 'px';
         textLayerDiv.style.width = canvas.width + 'px';
         annotationLayerDiv.style.height = canvas.height + 'px';
         annotationLayerDiv.style.width = canvas.width + 'px';
 
-        // Render PDF page into canvas context
-        const renderContext = {
-          canvasContext: ctx,
-          viewport: viewport
-        };
+        const renderContext = { canvasContext: ctx, viewport: viewport };
         const renderTask = page.render(renderContext);
 
-        renderTask.promise.then(function() {
-          pageRendering = false;
-          if (pageNumPending !== null) {
-            renderPage(pageNumPending);
-            pageNumPending = null;
-          }
-        });
+        renderTask.promise.then(() => { });
 
-        // Render the text layer (for selectable text)
         page.getTextContent().then(function(textContent) {
           pdfjsLib.renderTextLayer({
             textContent: textContent,
@@ -128,7 +97,6 @@
           });
         });
 
-        // Render the annotation layer (for clickable links)
         page.getAnnotations().then(function(annotationsData) {
           pdfjsLib.AnnotationLayer.render({
             annotations: annotationsData,
@@ -136,67 +104,29 @@
             page: page,
             viewport: viewport,
             linkService: {
-              // A simple link handler: open links in a new tab
-              navigateTo: function(dest) {
-                console.log('Navigating to destination:', dest);
-              }
+              getDestinationHash: () => '',
+              navigateTo: () => {},
+              getAnchorUrl: (dest) => dest,
+              externalLinkTarget: pdfjsLib.LinkTarget.BLANK
             },
             renderInteractiveForms: true
           });
         });
+
+        document.getElementById('page-num').textContent = num;
       });
-
-      // Update page number display
-      document.getElementById('page-num').textContent = num;
     }
 
-    /**
-     * Queues rendering of a page if another render is in progress.
-     */
-    function queueRenderPage(num) {
-      if (pageRendering) {
-        pageNumPending = num;
-      } else {
-        renderPage(num);
-      }
-    }
-
-    /**
-     * Displays the previous page.
-     */
-    function onPrevPage() {
-      if (pageNum <= 1) return;
-      pageNum--;
-      queueRenderPage(pageNum);
-    }
-
-    /**
-     * Displays the next page.
-     */
-    function onNextPage() {
-      if (pageNum >= pdfDoc.numPages) return;
-      pageNum++;
-      queueRenderPage(pageNum);
-    }
+    function onPrevPage() { if (pageNum > 1) renderPage(--pageNum); }
+    function onNextPage() { if (pageNum < pdfDoc.numPages) renderPage(++pageNum); }
+    function zoomIn() { scale *= 1.1; renderPage(pageNum); }
+    function zoomOut() { scale /= 1.1; renderPage(pageNum); }
 
     document.getElementById('prev-page').addEventListener('click', onPrevPage);
     document.getElementById('next-page').addEventListener('click', onNextPage);
-
-    /**
-     * Zoom In and Zoom Out functions.
-     */
-    function zoomIn() {
-      scale = scale * 1.1;
-      queueRenderPage(pageNum);
-    }
-    function zoomOut() {
-      scale = scale / 1.1;
-      queueRenderPage(pageNum);
-    }
     document.getElementById('zoom-in').addEventListener('click', zoomIn);
     document.getElementById('zoom-out').addEventListener('click', zoomOut);
 
-    // Asynchronously load the PDF.
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
       document.getElementById('page-count').textContent = pdfDoc.numPages;
