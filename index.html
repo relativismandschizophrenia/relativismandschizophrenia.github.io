@@ -52,30 +52,26 @@
     <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
     
     <script>
-      // Wait until the window and PDF viewer are fully loaded.
       window.addEventListener('load', () => {
-        // Select the hidden PDF viewer element.
         const pdfViewer = document.querySelector('#hiddenViewer pdfjs-viewer-element');
         
-        // Listen for an event indicating the PDF has rendered.
-        // (Depending on your version, you might need to adjust the event name.)
-        const onPageRendered = () => {
-          // Remove the event listener so it runs only once.
-          pdfViewer.removeEventListener('pagerendered', onPageRendered);
+        // Listen for the 'documentloaded' event instead of 'pagerendered'
+        pdfViewer.addEventListener('documentloaded', () => {
+          // Log to verify the event fired
+          console.log('PDF document loaded.');
           
           // Access the shadow DOM to get the internal viewer container.
+          // In pdfjs-viewer-element the main container is usually identified by "viewerContainer"
           const viewerContainer = pdfViewer.shadowRoot.querySelector('#viewerContainer');
           if (viewerContainer) {
-            // Append the viewer container to the output div.
             document.getElementById('output').appendChild(viewerContainer);
-            // Optionally remove the hidden viewer element from the DOM.
+            // Optionally remove the hidden viewer container once extracted
             document.getElementById('hiddenViewer').remove();
+            console.log('Viewer container moved to output.');
           } else {
             console.error('viewerContainer not found in the shadow DOM.');
           }
-        };
-        
-        pdfViewer.addEventListener('pagerendered', onPageRendered);
+        });
       });
     </script>
   </body>
