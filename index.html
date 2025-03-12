@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PDF Viewer</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <title>Interactive PDF Viewer</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf_viewer.min.css">
   <style>
     body {
@@ -12,25 +11,27 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: auto;
-      background: #f0f0f0;
+      overflow: hidden;
+      background-color: #f0f0f0;
     }
     #pdf-container {
       position: relative;
+      width: 80%;
+      height: 80%;
       overflow: auto;
-      width: 100%;
-      height: 100%;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    canvas {
-      display: block;
-      margin: auto;
+    #pdf-canvas {
+      width: 100%;
+      height: auto;
     }
     .textLayer, .annotationLayer {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
+      bottom: 0;
       pointer-events: none;
     }
     .annotationLayer a {
@@ -45,62 +46,57 @@
     <div id="annotation-layer" class="annotationLayer"></div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf_viewer.min.js"></script>
   <script>
+    const url = 'test.pdf'; // Path to your PDF file
+
+    // Set the workerSrc property
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-    const url = 'test.pdf';
 
-    let pdfDoc = null,
-        scale = 0.5, // Adjust for default zoom
-        canvas = document.getElementById('pdf-canvas'),
-        ctx = canvas.getContext('2d'),
-        container = document.getElementById('pdf-container'),
-        textLayerDiv = document.getElementById('text-layer'),
-        annotationLayerDiv = document.getElementById('annotation-layer');
+    const container = document.getElementById('pdf-container');
+    const canvas = document.getElementById('pdf-canvas');
+    const textLayerDiv = document.getElementById('text-layer');
+    const annotationLayerDiv = document.getElementById('annotation-layer');
+    const ctx = canvas.getContext('2d');
+    const scale = 1.0; // Adjust the scale for default zoom
 
-    function renderPage(page) {
-      const viewport = page.getViewport({ scale: scale });
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+    // Fetch the PDF document
+    pdfjsLib.getDocument(url).promise.then(pdfDoc => {
+      // Fetch the first page
+      pdfDoc.getPage(1).then(page => {
+        const viewport = page.getViewport({ scale: scale });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
 
-      textLayerDiv.innerHTML = '';
-      annotationLayerDiv.innerHTML = '';
+        // Render the page on the canvas
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        page.render(renderContext).promise.then(() => {
+          // Render the text layer
+          page.getTextContent().then(textContent => {
+            pdfjsLib.renderTextLayer({
+              textContent: textContent,
+              container: textLayerDiv,
+              viewport: viewport,
+              textDivs: []
+            });
+          });
 
-      textLayerDiv.style.height = `${canvas.height}px`;
-      textLayerDiv.style.width = `${canvas.width}px`;
-      annotationLayerDiv.style.height = `${canvas.height}px`;
-      annotationLayerDiv.style.width = `${canvas.width}px`;
-
-      page.render({ canvasContext: ctx, viewport: viewport });
-
-      page.getTextContent().then(function(textContent) {
-        pdfjsLib.renderTextLayer({
-          textContent,
-          container: textLayerDiv,
-          viewport,
-          textDivs: []
+          // Render the annotation layer (for links)
+          page.getAnnotations().then(annotationsData => {
+            pdfjsLib.AnnotationLayer.render({
+              annotations: annotationsData,
+              div: annotationLayerDiv,
+              page: page,
+              viewport: viewport,
+              linkService: new pdfjsLib.SimpleLinkService()
+            });
+          });
         });
       });
-
-      page.getAnnotations().then(function(annotationsData) {
-        pdfjsLib.AnnotationLayer.render({
-          annotations: annotationsData,
-          div: annotationLayerDiv,
-          page,
-          viewport,
-          linkService: {
-            getDestinationHash: () => '',
-            navigateTo: () => {},
-            getAnchorUrl: (dest) => dest,
-            externalLinkTarget: pdfjsLib.LinkTarget.BLANK
-          },
-          renderInteractiveForms: true
-        });
-      });
-    }
-
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-      pdfDoc = pdfDoc_;
-      pdfDoc.getPage(1).then(renderPage);
     });
   </script>
 </body>
