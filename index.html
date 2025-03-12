@@ -17,7 +17,19 @@
       height: 100vh;
       overflow: hidden;
     } 
-  #toolbarContainer {
+
+  </style>
+</head>
+
+<body>
+  <pdfjs-viewer-element 
+    src="/test.pdf" 
+    viewer-path="/pdfjs-4.10.38-dist" 
+    viewer-css-theme="DARK"
+    zoom="30"
+    viewer-extra-styles=" 
+    
+    #toolbarContainer {
     height: 0px !important;
     overflow: hidden !important;
   }
@@ -30,17 +42,7 @@
   #sidebarContainer {
     height: 0px !important;
     overflow: hidden !important;
-  }
-    
-  </style>
-</head>
-
-<body>
-  <pdfjs-viewer-element 
-    src="/test.pdf" 
-    viewer-path="/pdfjs-4.10.38-dist" 
-    viewer-css-theme="DARK"
-    zoom="30"
+  }"  
     >
   </pdfjs-viewer-element>
 
