@@ -2,26 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Portfolio PDF Viewer</title>
+  <title>PDF Viewer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf_viewer.min.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: auto;
+      background: #f0f0f0;
     }
     #pdf-container {
       position: relative;
-      margin: 20px auto;
-      border: 1px solid #ccc;
-      width: 80%;
-      height: 90vh;
       overflow: auto;
+      width: 100%;
+      height: 100%;
     }
     canvas {
       display: block;
-      margin: 0 auto;
+      margin: auto;
     }
     .textLayer, .annotationLayer {
       position: absolute;
@@ -33,12 +35,6 @@
     }
     .annotationLayer a {
       pointer-events: auto;
-    }
-    #controls {
-      margin-bottom: 20px;
-    }
-    button {
-      margin: 0 5px;
     }
   </style>
 </head>
@@ -54,76 +50,57 @@
     const url = 'test.pdf';
 
     let pdfDoc = null,
-        pageNum = 1,
-        scale = 1.0,
+        scale = 0.5, // Adjust for default zoom
         canvas = document.getElementById('pdf-canvas'),
         ctx = canvas.getContext('2d'),
         container = document.getElementById('pdf-container'),
         textLayerDiv = document.getElementById('text-layer'),
         annotationLayerDiv = document.getElementById('annotation-layer');
 
-    function renderPage(num) {
-      pdfDoc.getPage(num).then(function(page) {
-        const viewport = page.getViewport({ scale: scale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+    function renderPage(page) {
+      const viewport = page.getViewport({ scale: scale });
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
-        textLayerDiv.innerHTML = '';
-        annotationLayerDiv.innerHTML = '';
+      textLayerDiv.innerHTML = '';
+      annotationLayerDiv.innerHTML = '';
 
-        textLayerDiv.style.height = canvas.height + 'px';
-        textLayerDiv.style.width = canvas.width + 'px';
-        annotationLayerDiv.style.height = canvas.height + 'px';
-        annotationLayerDiv.style.width = canvas.width + 'px';
+      textLayerDiv.style.height = `${canvas.height}px`;
+      textLayerDiv.style.width = `${canvas.width}px`;
+      annotationLayerDiv.style.height = `${canvas.height}px`;
+      annotationLayerDiv.style.width = `${canvas.width}px`;
 
-        const renderContext = { canvasContext: ctx, viewport: viewport };
-        const renderTask = page.render(renderContext);
+      page.render({ canvasContext: ctx, viewport: viewport });
 
-        renderTask.promise.then(() => { });
-
-        page.getTextContent().then(function(textContent) {
-          pdfjsLib.renderTextLayer({
-            textContent: textContent,
-            container: textLayerDiv,
-            viewport: viewport,
-            textDivs: []
-          });
+      page.getTextContent().then(function(textContent) {
+        pdfjsLib.renderTextLayer({
+          textContent,
+          container: textLayerDiv,
+          viewport,
+          textDivs: []
         });
+      });
 
-        page.getAnnotations().then(function(annotationsData) {
-          pdfjsLib.AnnotationLayer.render({
-            annotations: annotationsData,
-            div: annotationLayerDiv,
-            page: page,
-            viewport: viewport,
-            linkService: {
-              getDestinationHash: () => '',
-              navigateTo: () => {},
-              getAnchorUrl: (dest) => dest,
-              externalLinkTarget: pdfjsLib.LinkTarget.BLANK
-            },
-            renderInteractiveForms: true
-          });
+      page.getAnnotations().then(function(annotationsData) {
+        pdfjsLib.AnnotationLayer.render({
+          annotations: annotationsData,
+          div: annotationLayerDiv,
+          page,
+          viewport,
+          linkService: {
+            getDestinationHash: () => '',
+            navigateTo: () => {},
+            getAnchorUrl: (dest) => dest,
+            externalLinkTarget: pdfjsLib.LinkTarget.BLANK
+          },
+          renderInteractiveForms: true
         });
-
-        document.getElementById('page-num').textContent = num;
       });
     }
 
-    function onPrevPage() { if (pageNum > 1) renderPage(--pageNum); }
-    function onNextPage() { if (pageNum < pdfDoc.numPages) renderPage(++pageNum); }
-    function zoomIn() { scale *= 1.1; renderPage(pageNum); }
-    function zoomOut() { scale /= 1.1; renderPage(pageNum); }
-
-    document.getElementById('prev-page').addEventListener('click', onPrevPage);
-    document.getElementById('next-page').addEventListener('click', onNextPage);
-    document.getElementById('zoom-in').addEventListener('click', zoomIn);
-    document.getElementById('zoom-out').addEventListener('click', zoomOut);
-
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
-      document.getElementById('page-count').textContent = pdfDoc.numPages;
-      renderPage(pageNum);
+      pdfDoc.getPage(1).then(renderPage);
     });
   </script>
 </body>
