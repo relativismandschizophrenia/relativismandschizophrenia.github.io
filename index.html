@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>test</title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2022.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.3px 'Times New Roman'; color: #000000; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.3px 'Times New Roman'; color: #000000; -webkit-text-stroke: #000000; min-height: 16.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;Simple PDF Viewer&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- Include PDF.js library from CDN --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-family: Arial, sans-serif;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>text-align: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>#pdf-controls {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>#pdf-canvas {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border: 1px solid #ccc;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: auto;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;h1&gt;Simple PDF Viewer&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div id="pdf-controls"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="prev-page"&gt;Previous&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;span&gt;Page: &lt;span id="page-num"&gt;&lt;/span&gt; / &lt;span id="page-count"&gt;&lt;/span&gt;&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="next-page"&gt;Next&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;canvas id="pdf-canvas"&gt;&lt;/canvas&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// URL of the PDF file – replace with your file path or URL</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const url = 'your-file.pdf';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>let pdfDoc = null,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>pageNum = 1,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>pageRendering = false,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>pageNumPending = null,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>scale = 1.5,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas = document.getElementById('pdf-canvas'),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx = canvas.getContext('2d');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Specify the workerSrc property (from CDN)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/**</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>* Renders the current page.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>* @param num Page number.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>*/</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function renderPage(num) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>pageRendering = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>pdfDoc.getPage(num).then(function(page) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const viewport = page.getViewport({ scale: scale });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas.height = viewport.height;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas.width = viewport.width;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Render PDF page into canvas context.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const renderContext = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>canvasContext: ctx,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>viewport: viewport</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const renderTask = page.render(renderContext);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>renderTask.promise.then(function() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>pageRendering = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>if (pageNumPending !== null) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderPage(pageNumPending);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>pageNumPending = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Update page counters</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>document.getElementById('page-num').textContent = num;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/**</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>* If another page rendering is in progress, enqueue the next page.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>* @param num Page number.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>*/</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function queueRenderPage(num) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (pageRendering) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>pageNumPending = num;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>renderPage(num);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/**</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>* Displays previous page.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>*/</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function onPrevPage() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (pageNum &lt;= 1) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>pageNum--;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>queueRenderPage(pageNum);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('prev-page').addEventListener('click', onPrevPage);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/**</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>* Displays next page.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">     </span>*/</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function onNextPage() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (pageNum &gt;= pdfDoc.numPages) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>pageNum++;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>queueRenderPage(pageNum);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('next-page').addEventListener('click', onNextPage);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Asynchronously download the PDF.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>pdfDoc = pdfDoc_;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>document.getElementById('page-count').textContent = pdfDoc.numPages;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>renderPage(pageNum);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
