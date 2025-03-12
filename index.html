@@ -17,11 +17,11 @@
         overflow: hidden;
       }
       /* Shift the viewer up by 10px so that the top 10px are hidden */
-      .crop-container > pdfjs-viewer-element {
+      /*.crop-container > pdfjs-viewer-element {
         position: absolute;
         top: -20px;
         left: 0;
-        right: 0;
+        right: 0; */
         /* Increase the height to cover the extra shifted area */
         /* height: calc(100vh + 20px); */
       }
@@ -34,16 +34,21 @@
         viewer-path="/pdfjs-4.10.38-dist" 
         viewer-css-theme="DARK"
         zoom="30"
+        style="
+          overflow: hidden;
+          position: absolute;
+          top: -20px;
+          left: 0;
+          right: 0
+          height: calc(100vh + 20px);
+          "
         viewer-extra-styles=" 
-          #toolbarContainer {
-            height: 0px !important;
-            overflow: hidden !important;
-            display: none !important;
-          }
-          #secondaryToolbar, 
+          #toolbarContainer,
+          #secondaryToolbar,
           #sidebarContainer {
             height: 0px !important;
             overflow: hidden !important;
+            display: none !important;
           }">
       </pdfjs-viewer-element>
     </div>
