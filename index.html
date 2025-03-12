@@ -15,9 +15,6 @@
       height: 100vh;
       overflow: hidden;
     }
-    #document {
-      overflow: hidden;
-    }
   </style>
 </head>
 
@@ -27,7 +24,7 @@
     viewer-path="/pdfjs-4.10.38-dist" 
     viewer-css-theme="DARK"
     zoom="30"
-    viewer-extra-styles=".loadingIndicator, .navbar, .toolbar, #toolbarContainer, #sidebarContainer { display: none; !important; }"
+    viewer-extra-styles=".loadingIndicator, .navbar, .toolbar, #toolbarContainer, #sidebarContainer { display: none; !important; } #document { overflow: hidden; !important; height: 100vh; }"
     >
   </pdfjs-viewer-element>
 
