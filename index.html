@@ -24,7 +24,12 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 </script>
 <body>
-  
+  <h1>Custom PDF Viewer</h1>
+  <div id="controls">
+    <button id="prev-page">Previous</button>
+    <span>Page: <span id="page-num">1</span> / <span id="page-count">?</span></span>
+    <button id="next-page">Next</button>
+  </div>
   <canvas id="pdf-canvas"></canvas>
   
   <script>
