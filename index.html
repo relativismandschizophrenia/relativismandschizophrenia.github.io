@@ -1,28 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Interactive PDF Viewer</title>
-  <script type="module" src="https://unpkg.com/pdfjs-viewer-element"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>viewer</title>
   <style>
-    body, html {
+    body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f0f0f0;
     }
-    pdf-viewer {
-      width: 80%;
-      height: 90%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    pdfjs-viewer-element {
+      height: 100vh;
+      height: 100dvh;
     }
   </style>
 </head>
+
 <body>
-  <pdf-viewer src="test.pdf" viewer-path="/pdfjs-4.10.38-dist" open></pdf-viewer>
+  <pdfjs-viewer-element src="/test.pdf" viewer-path="/pdfjs-4.10.38-dist" page="1">
+  </pdfjs-viewer-element>
+
+  <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
 </body>
+
 </html>
