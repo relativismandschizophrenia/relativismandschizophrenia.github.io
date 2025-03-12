@@ -24,7 +24,6 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 </script>
 <body>
-  <h1>Custom PDF Viewer</h1>
   <div id="controls">
     <button id="prev-page">Previous</button>
     <span>Page: <span id="page-num">1</span> / <span id="page-count">?</span></span>
@@ -39,7 +38,7 @@
         pageNum = 1,
         pageRendering = false,
         pageNumPending = null,
-        scale = 0.25, // Adjust this value to change the zoom level
+        scale = 0.5, // Adjust this value to change the zoom level
         canvas = document.getElementById('pdf-canvas'),
         ctx = canvas.getContext('2d');
 
