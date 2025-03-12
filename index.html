@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Viewer</title>
     <style>
       body {
@@ -10,68 +10,46 @@
         padding: 0;
         overflow: hidden;
       }
-      pdfjs-viewer-element {
+      /* Crop container hides any content outside its boundaries */
+      .crop-container {
+        position: relative;
         height: 100vh;
         overflow: hidden;
+      }
+      /* Shift the viewer up by 10px so that the top 10px are hidden */
+      .crop-container > pdfjs-viewer-element {
+        position: absolute;
+        top: -10px;
+        left: 0;
+        right: 0;
+        /* Increase the height to cover the extra shifted area */
+        height: calc(100vh + 10px);
       }
     </style>
   </head>
   <body>
-    <pdfjs-viewer-element 
-      src="/test.pdf" 
-      viewer-path="/pdfjs-4.10.38-dist" 
-      viewer-css-theme="DARK"
-      zoom="30"
-      viewer-extra-styles=" 
-        #toolbarContainer {
-          height: 0px !important;
-          overflow: hidden !important;
-        }
-        #toolbarContainer > * {
-          display: none !important;
-        }
-        #secondaryToolbar, 
-        #sidebarContainer {
-          height: 0px !important;
-          overflow: hidden !important;
-        }"
-    ></pdfjs-viewer-element>
-
+    <div class="crop-container">
+      <pdfjs-viewer-element 
+        src="/test.pdf" 
+        viewer-path="/pdfjs-4.10.38-dist" 
+        viewer-css-theme="DARK"
+        zoom="30"
+        viewer-extra-styles=" 
+          #toolbarContainer {
+            height: 0px !important;
+            overflow: hidden !important;
+          }
+          #toolbarContainer > * {
+            display: none !important;
+          }
+          #secondaryToolbar, 
+          #sidebarContainer {
+            height: 0px !important;
+            overflow: hidden !important;
+          }">
+      </pdfjs-viewer-element>
+    </div>
+    
     <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
-    <script>
-      window.addEventListener('load', () => {
-        const pdfViewer = document.querySelector('pdfjs-viewer-element');
-        // Listen for the "documentloaded" event which fires when the PDF is fully loaded.
-        pdfViewer.addEventListener('documentloaded', () => {
-          // Access the viewer's shadow DOM.
-          const shadow = pdfViewer.shadowRoot;
-          if (!shadow) {
-            console.error('Shadow DOM not available.');
-            return;
-          }
-          
-          // Attempt to select the main container that holds the rendered PDF pages.
-          // (Make sure this selector is correct for your version.)
-          const mainContainer = shadow.querySelector('#mainContainer');
-          if (!mainContainer) {
-            console.error('mainContainer not found in the shadow DOM.');
-            return;
-          }
-          
-          // Scroll to the bottom immediately.
-          mainContainer.scrollTop = mainContainer.scrollHeight;
-          
-          // Remove the scrollbar and prevent any scrolling.
-          mainContainer.style.overflow = 'hidden';
-          
-          // Additionally, override any scroll events to lock the scroll position.
-          mainContainer.addEventListener('scroll', (e) => {
-            e.target.scrollTop = e.target.scrollHeight;
-          });
-          
-          console.log('Scrolled to the bottom and disabled scrolling.');
-        });
-      });
-    </script>
   </body>
 </html>
