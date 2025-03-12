@@ -16,7 +16,7 @@
         height: 100vh;
         overflow: hidden;
       }
-      /* Shift the viewer up by 20px so that the top 20px are hidden */
+      /* Shift the viewer up by 10px so that the top 10px are hidden */
       .crop-container > pdfjs-viewer-element {
         position: absolute;
         top: -20px;
@@ -29,39 +29,23 @@
     </style>
   </head>
   <body>
-    <!-- This container will host the viewer element -->
-    <div class="crop-container" id="cropContainer">
-      <!-- The pdfjs-viewer-element will be created dynamically -->
-    </div>
-    
-    <!-- Load the pdfjs-viewer-element module -->
-    <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
-    <script>
-      // Compute the zoom setting based on aspect ratio at load time.
-      // If the device is in portrait orientation (height > width), use "page-width", otherwise "30".
-      const zoomVal = (window.innerHeight > window.innerWidth) ? "page-width" : "30";
-      
-      // Create the pdfjs-viewer-element dynamically.
-      const viewer = document.createElement("pdfjs-viewer-element");
-      viewer.setAttribute("src", "/portfolio.pdf");
-      viewer.setAttribute("viewer-path", "/pdfjs-4.10.38-dist");
-      viewer.setAttribute("viewer-css-theme", "DARK");
-      viewer.setAttribute("zoom", zoomVal);
-      // Use viewer-extra-styles to hide toolbars and side panels.
-      viewer.setAttribute("viewer-extra-styles", `
+    <div class="crop-container">
+      <pdfjs-viewer-element 
+        src="/portfolio.pdf" 
+        viewer-path="/pdfjs-4.10.38-dist" 
+        viewer-css-theme="DARK"
+        zoom="30"
+        viewer-extra-styles=" 
           #toolbarContainer, 
           #secondaryToolbar, 
           #sidebarContainer {
             height: 0px !important;
             overflow: hidden !important;
             display: none !important;
-          }
-      `);
-      
-      // Append the viewer element into the crop container.
-      document.getElementById("cropContainer").appendChild(viewer);
-      
-      console.log("Aspect ratio set zoom to:", zoomVal);
-    </script>
+          }">
+      </pdfjs-viewer-element>
+    </div>
+    
+    <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
   </body>
 </html>
