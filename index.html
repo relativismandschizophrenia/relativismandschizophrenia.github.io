@@ -3,74 +3,73 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PDF Viewer Output</title>
+    <title>Viewer</title>
     <style>
       body {
         margin: 0;
         padding: 0;
         overflow: hidden;
       }
-      /* Hidden container for the background viewer */
-      #hiddenViewer {
-        display: none;
-      }
-      /* Visible output container for the extracted viewer */
-      #output {
+      pdfjs-viewer-element {
         height: 100vh;
         overflow: hidden;
       }
     </style>
   </head>
   <body>
-    <!-- Hidden PDF viewer element -->
-    <div id="hiddenViewer">
-      <pdfjs-viewer-element 
-        src="/test.pdf" 
-        viewer-path="/pdfjs-4.10.38-dist" 
-        viewer-css-theme="DARK"
-        zoom="30"
-        viewer-extra-styles=" 
-          #toolbarContainer {
-            height: 0px !important;
-            overflow: hidden !important;
-          }
-          #toolbarContainer > * {
-            display: none !important;
-          }
-          #secondaryToolbar, 
-          #sidebarContainer {
-            height: 0px !important;
-            overflow: hidden !important;
-          }">
-      </pdfjs-viewer-element>
-    </div>
-    
-    <!-- Output container where the viewer container will be moved -->
-    <div id="output"></div>
-    
-    <!-- Load the pdfjs-viewer-element module -->
+    <pdfjs-viewer-element 
+      src="/test.pdf" 
+      viewer-path="/pdfjs-4.10.38-dist" 
+      viewer-css-theme="DARK"
+      zoom="30"
+      viewer-extra-styles=" 
+        #toolbarContainer {
+          height: 0px !important;
+          overflow: hidden !important;
+        }
+        #toolbarContainer > * {
+          display: none !important;
+        }
+        #secondaryToolbar, 
+        #sidebarContainer {
+          height: 0px !important;
+          overflow: hidden !important;
+        }"
+    ></pdfjs-viewer-element>
+
     <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
-    
     <script>
       window.addEventListener('load', () => {
-        const pdfViewer = document.querySelector('#hiddenViewer pdfjs-viewer-element');
-        
-        // Listen for the 'documentloaded' event instead of 'pagerendered'
+        const pdfViewer = document.querySelector('pdfjs-viewer-element');
+        // Listen for the "documentloaded" event which fires when the PDF is fully loaded.
         pdfViewer.addEventListener('documentloaded', () => {
-          // Log to verify the event fired
-          console.log('PDF document loaded.');
-          
-          // Access the shadow DOM to get the internal viewer container.
-          // In pdfjs-viewer-element the main container is usually identified by "viewerContainer"
-          const viewerContainer = pdfViewer.shadowRoot.querySelector('#viewerContainer');
-          if (viewerContainer) {
-            document.getElementById('output').appendChild(viewerContainer);
-            // Optionally remove the hidden viewer container once extracted
-            document.getElementById('hiddenViewer').remove();
-            console.log('Viewer container moved to output.');
-          } else {
-            console.error('viewerContainer not found in the shadow DOM.');
+          // Access the viewer's shadow DOM.
+          const shadow = pdfViewer.shadowRoot;
+          if (!shadow) {
+            console.error('Shadow DOM not available.');
+            return;
           }
+          
+          // Attempt to select the main container that holds the rendered PDF pages.
+          // (Make sure this selector is correct for your version.)
+          const mainContainer = shadow.querySelector('#mainContainer');
+          if (!mainContainer) {
+            console.error('mainContainer not found in the shadow DOM.');
+            return;
+          }
+          
+          // Scroll to the bottom immediately.
+          mainContainer.scrollTop = mainContainer.scrollHeight;
+          
+          // Remove the scrollbar and prevent any scrolling.
+          mainContainer.style.overflow = 'hidden';
+          
+          // Additionally, override any scroll events to lock the scroll position.
+          mainContainer.addEventListener('scroll', (e) => {
+            e.target.scrollTop = e.target.scrollHeight;
+          });
+          
+          console.log('optimisng done');
         });
       });
     </script>
