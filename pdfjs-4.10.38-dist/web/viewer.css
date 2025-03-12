@@ -1955,7 +1955,7 @@
     --editor-toolbar-focus-outline-color:#0060df;
     --editor-toolbar-shadow:0 2px 6px 0 rgb(58 57 68 / 0.2);
     --editor-toolbar-vert-offset:6px;
-    --editor-toolbar-height:28px;
+    --editor-toolbar-height:0px;
     --editor-toolbar-padding:2px;
     --alt-text-done-color:#2ac3a2;
     --alt-text-warning-color:#0090ed;
@@ -3379,7 +3379,7 @@
   --sidebar-transition-duration:200ms;
   --sidebar-transition-timing-function:ease;
 
-  --toolbar-height:32px;
+  --toolbar-height:0px;
   --toolbar-horizontal-padding:1px;
   --toolbar-vertical-padding:2px;
   --icon-size:16px;
@@ -3615,11 +3615,11 @@
 }
 
 html[data-toolbar-density="compact"]{
-    --toolbar-height:30px;
+    --toolbar-height:0px;
   }
 
 html[data-toolbar-density="touch"]{
-    --toolbar-height:44px;
+    --toolbar-height:0px;
   }
 
 html,
