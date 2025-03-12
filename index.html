@@ -10,54 +10,58 @@
         padding: 0;
         overflow: hidden;
       }
+      /* Crop container hides any content outside its boundaries */
       .crop-container {
         position: relative;
         height: 100vh;
         overflow: hidden;
       }
+      /* Shift the viewer up by 20px so that the top 20px are hidden */
       .crop-container > pdfjs-viewer-element {
         position: absolute;
         top: -20px;
         left: 0;
         right: 0;
+        /* Increase the height to cover the extra shifted area */
         height: calc(100vh + 20px);
         overflow: hidden;
       }
     </style>
   </head>
   <body>
-    <div class="crop-container">
-      <pdfjs-viewer-element 
-        src="/portfolio.pdf" 
-        viewer-path="/pdfjs-4.10.38-dist" 
-        viewer-css-theme="DARK"
-        viewer-extra-styles=" 
+    <!-- This container will host the viewer element -->
+    <div class="crop-container" id="cropContainer">
+      <!-- The pdfjs-viewer-element will be created dynamically -->
+    </div>
+    
+    <!-- Load the pdfjs-viewer-element module -->
+    <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
+    <script>
+      // Compute the zoom setting based on aspect ratio at load time.
+      // If the device is in portrait orientation (height > width), use "page-width", otherwise "30".
+      const zoomVal = (window.innerHeight > window.innerWidth) ? "page-width" : "30";
+      
+      // Create the pdfjs-viewer-element dynamically.
+      const viewer = document.createElement("pdfjs-viewer-element");
+      viewer.setAttribute("src", "/portfolio.pdf");
+      viewer.setAttribute("viewer-path", "/pdfjs-4.10.38-dist");
+      viewer.setAttribute("viewer-css-theme", "DARK");
+      viewer.setAttribute("zoom", zoomVal);
+      // Use viewer-extra-styles to hide toolbars and side panels.
+      viewer.setAttribute("viewer-extra-styles", `
           #toolbarContainer, 
           #secondaryToolbar, 
           #sidebarContainer {
             height: 0px !important;
             overflow: hidden !important;
             display: none !important;
-          }">
-      </pdfjs-viewer-element>
-    </div>
-    
-    <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
-    <script>
-      // Run once the DOM content is loaded.
-      document.addEventListener('DOMContentLoaded', () => {
-        const viewer = document.querySelector('pdfjs-viewer-element');
-        if (viewer) {
-          // Compute the aspect ratio.
-          const aspectRatio = window.innerWidth / window.innerHeight;
-          // For portrait orientation (aspectRatio < 1) set zoom to "page-width"
-          if (aspectRatio < 1) {
-            viewer.setAttribute('zoom', 'page-width');
-          } else {
-            viewer.setAttribute('zoom', '30');
           }
-        }
-      });
+      `);
+      
+      // Append the viewer element into the crop container.
+      document.getElementById("cropContainer").appendChild(viewer);
+      
+      console.log("Aspect ratio set zoom to:", zoomVal);
     </script>
   </body>
 </html>
