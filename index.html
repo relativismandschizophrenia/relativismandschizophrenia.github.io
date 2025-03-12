@@ -6,15 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>viewer</title>
   <style>
+    
     body {
       margin: 0;
       padding: 0;
       overflow: hidden;
     }
+    
     pdfjs-viewer-element {
       height: 100vh;
       overflow: hidden;
-    }
+    } 
+  #toolbarContainer {
+    height: 0px !important;
+    overflow: hidden !important;
+  }
+
+  #toolbarContainer > * {
+    display: none !important;
+  }
+
+  #secondaryToolbar, 
+  #sidebarContainer {
+    height: 0px !important;
+    overflow: hidden !important;
+  }
+    
   </style>
 </head>
 
@@ -24,7 +41,6 @@
     viewer-path="/pdfjs-4.10.38-dist" 
     viewer-css-theme="DARK"
     zoom="30"
-    viewer-extra-styles=".loadingIndicator, .navbar, .toolbar, #toolbarContainer, #sidebarContainer { display: none; !important; } #document { overflow: hidden; !important; height: 100vh; }"
     >
   </pdfjs-viewer-element>
 
