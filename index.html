@@ -1,52 +1,82 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>viewer</title>
-  <style>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Viewer Output</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      /* Hidden container for the background viewer */
+      #hiddenViewer {
+        display: none;
+      }
+      /* Visible output container for the extracted viewer */
+      #output {
+        height: 100vh;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hidden PDF viewer element -->
+    <div id="hiddenViewer">
+      <pdfjs-viewer-element 
+        src="/test.pdf" 
+        viewer-path="/pdfjs-4.10.38-dist" 
+        viewer-css-theme="DARK"
+        zoom="30"
+        viewer-extra-styles=" 
+          #toolbarContainer {
+            height: 0px !important;
+            overflow: hidden !important;
+          }
+          #toolbarContainer > * {
+            display: none !important;
+          }
+          #secondaryToolbar, 
+          #sidebarContainer {
+            height: 0px !important;
+            overflow: hidden !important;
+          }">
+      </pdfjs-viewer-element>
+    </div>
     
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
+    <!-- Output container where the viewer container will be moved -->
+    <div id="output"></div>
     
-    pdfjs-viewer-element {
-      height: 100vh;
-      overflow: hidden;
-    } 
-
-  </style>
-</head>
-
-<body>
-  <pdfjs-viewer-element 
-    src="/test.pdf" 
-    viewer-path="/pdfjs-4.10.38-dist" 
-    viewer-css-theme="DARK"
-    zoom="30"
-    viewer-extra-styles=" 
+    <!-- Load the pdfjs-viewer-element module -->
+    <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
     
-    #toolbarContainer {
-    height: 0px !important;
-    overflow: hidden !important;
-  }
-
-  #toolbarContainer > * {
-    display: none !important;
-  }
-
-  #secondaryToolbar, 
-  #sidebarContainer {
-    height: 0px !important;
-    overflow: hidden !important;
-  }"  
-    >
-  </pdfjs-viewer-element>
-
-  <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
-</body>
-
+    <script>
+      // Wait until the window and PDF viewer are fully loaded.
+      window.addEventListener('load', () => {
+        // Select the hidden PDF viewer element.
+        const pdfViewer = document.querySelector('#hiddenViewer pdfjs-viewer-element');
+        
+        // Listen for an event indicating the PDF has rendered.
+        // (Depending on your version, you might need to adjust the event name.)
+        const onPageRendered = () => {
+          // Remove the event listener so it runs only once.
+          pdfViewer.removeEventListener('pagerendered', onPageRendered);
+          
+          // Access the shadow DOM to get the internal viewer container.
+          const viewerContainer = pdfViewer.shadowRoot.querySelector('#viewerContainer');
+          if (viewerContainer) {
+            // Append the viewer container to the output div.
+            document.getElementById('output').appendChild(viewerContainer);
+            // Optionally remove the hidden viewer element from the DOM.
+            document.getElementById('hiddenViewer').remove();
+          } else {
+            console.error('viewerContainer not found in the shadow DOM.');
+          }
+        };
+        
+        pdfViewer.addEventListener('pagerendered', onPageRendered);
+      });
+    </script>
+  </body>
 </html>
