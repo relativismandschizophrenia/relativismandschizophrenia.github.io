@@ -79,5 +79,18 @@
     </div>
     
     <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.style.overflow = "hidden"; // Hide global scrollbar
+
+    // Wait for PDF.js viewer to load all pages
+    document.addEventListener("pagesloaded", function () {
+      document.getElementById("viewerContainer").scrollTo({
+        top: 0,
+        behavior: "smooth", // Smooth scrolling effect
+      });
+    });
+  });
+</script>
   </body>
 </html>
