@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html>
+
+  /* 
+  ▄█    █▄       ▄████████  ▄█        ▄█        ▄██████▄           
+  ███    ███     ███    ███ ███       ███       ███    ███          
+  ███    ███     ███    █▀  ███       ███       ███    ███          
+ ▄███▄▄▄▄███▄▄  ▄███▄▄▄     ███       ███       ███    ███          
+▀▀███▀▀▀▀███▀  ▀▀███▀▀▀     ███       ███       ███    ███          
+  ███    ███     ███    █▄  ███       ███       ███    ███          
+  ███    ███     ███    ███ ███▌    ▄ ███▌    ▄ ███    ███          
+  ███    █▀      ██████████ █████▄▄██ █████▄▄██  ▀██████▀           
+                            ▀         ▀                              
+  */
+  
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>maksim.txt</title>
-    <script>
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-{ window.location.href = "portfolio-light.pdf";}
-else (document.body.style.overflow = 'hidden';)
-    </script>
+    <script> if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+{ window.location.href = "portfolio-light.pdf";} </script>
+    <script> document.body.style.overflow = "hidden"; </script>
     <style>
       body {
         margin: 0;
         padding: 0;
         overflow: hidden;
       }
-      /* Crop container hides any content outside its boundaries */
       .crop-container {
         position: relative;
         height: 100vh;
         overflow: hidden;
       }
-      /* Shift the viewer up by 10px so that the top 10px are hidden */
       .crop-container > pdfjs-viewer-element {
         position: absolute;
         top: -20px;
         left: 0;
         right: 0;
-        /* Increase the height to cover the extra shifted area */
         height: calc(100vh + 20px);
         overflow: hidden;
       }
