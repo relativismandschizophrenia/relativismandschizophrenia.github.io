@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>maksim.txt</title>
-    <script> if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    <script> if(/Android|webOS|Safari|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
 { window.location.href = "portfolio-light.pdf";} </script>
     <style>
       body {
@@ -81,13 +81,11 @@
     <script type="module" src="https://cdn.skypack.dev/pdfjs-viewer-element"></script>
     <script>
   document.addEventListener("DOMContentLoaded", function () {
-    document.body.style.overflow = "hidden"; // Hide global scrollbar
-
-    // Wait for PDF.js viewer to load all pages
+    document.body.style.overflow = "hidden";
     document.addEventListener("pagesloaded", function () {
-      document.getElementById("viewerContainer").scrollTo({
+      document.getElementById("crop-container").scrollTo({
         top: -20,
-        behavior: "smooth", // Smooth scrolling effect
+        behavior: "smooth",
       });
     });
   });
