@@ -17,6 +17,8 @@
         position: relative;
         height: 100vh;
         overflow: hidden;
+        -ms-overflow-style: none; 
+        scrollbar-width: none; 
       }
       .crop-container > pdfjs-viewer-element {
         position: absolute;
@@ -26,8 +28,13 @@
         height: calc(100vh + 20px);
         overflow: hidden;
       }
-      ::-webkit-scrollbar {
-        display: none;
+      .document {
+        overflow: hidden;
+        -ms-overflow-style: none; 
+        scrollbar-width: none; 
+      }
+      .crop-container::-webkit-scrollbar { 
+        display: none; 
       }
     </style>
   </head>
